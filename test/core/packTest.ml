@@ -178,6 +178,22 @@ let tests = [
         end
       end
     end;
+  "serialize_benchmark" >:: begin fun _ ->
+    let rec make_list acc n obj =
+      match n with
+      | 0 -> acc
+      | n -> make_list (obj :: acc) (n-1) obj
+    in
+    let leaf =
+      `FixArray (concat_map (fun (name, ok, _) -> List.map snd ok) valid)
+    in
+    let big_structure =
+        `Array16 (make_list [] 100 (`Array16 (make_list [] 1_000 leaf)))
+    in
+    let (_: string) = Serialize.serialize_string big_structure in
+    ()
+  end;
+(*
   "long_string" >:: begin fun _ ->
     let rec make_list acc = function
       | 0 -> acc
@@ -188,4 +204,5 @@ let tests = [
     let packed = pack orig in
     assert_equal orig (unpack packed)
   end;
+*)
 ]
